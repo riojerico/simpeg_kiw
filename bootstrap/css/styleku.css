@@ -1,0 +1,47 @@
+body #modalHapus {
+    /* new custom width */
+    width: 560px;
+    /* must be half of the width, minus scrollbar on the left (30px) */
+    margin-left: -280px;
+}
+
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+   max-width:1200px;
+  }
+}
+
+.form-control.mb10{
+  margin-bottom:10px;
+}
+
+.datepicker{z-index:1151 !important;}
+
+th.description {vertical-align: top;}
+
+
+
+.ulku{
+	margin-left: -40px;
+}
+
+.ulku2{
+  margin-left: -20px;
+  margin-bottom: 10px;
+}
+.ulku3{
+  margin-left: -27px;
+ 
+}
+
+.ulku4{
+  margin-left: 27px;
+ 
+}
+
+}
+.clearfix.mb10
+{
+  margin-bottom:10px;
+}

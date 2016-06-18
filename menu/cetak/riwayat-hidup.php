@@ -1,0 +1,385 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Cetak Data Riwayat hidup</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.5 -->
+	
+	<style>
+		* {font-family: sans-serif; font-size: 13px;}
+	    @page { margin: 50px 50px; }
+	    #header { position: fixed; left: 0px; top: -180px; right: 0px; height: 150px; background-color: #fff; text-align: center; }
+	    #footer { position: fixed; left: 710px; bottom: -160px; right: 0px; height: 150px; background-color: #fff; }
+	    #comment{ position: fixed; left: -10px; bottom: -160px; right: 0px; height: 150px; background-color: #fff; font-size: 8;}
+	    #footer .page:after { content: counter(page, upper-roman); }
+	    .l1{margin-top: 0;}
+	    .l2{margin-top: 20; margin-bottom: 20;}
+
+	    table {width: 100%; margin-top: -15; margin-bottom: 20; margin-left: 130;table-layout: relative; }
+		th, td {text-align: left; padding: 5px; }
+		tr:nth-child(even){background-color: #f2f2f2}
+		th { background-color: #fff; color: black;}
+  	</style>
+</head>
+
+<body>
+<?php
+$id=$_GET['id'];
+$query=mysql_query("select * from data_pegawai where id='$id'");
+$query2=mysql_fetch_array($query);
+
+//ttl_propinsi
+$getTtl_propinsi=$query2['propinsi'];
+$getTtl_propinsi2=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi = '$getTtl_propinsi'");
+$getTtl_propinsi3=mysql_fetch_array($getTtl_propinsi2);
+
+//ttl_kota
+$getTtlPropinsi=$query2['propinsi'];
+$getTtlKota=$query2['kota'];
+$getTtlKota2=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi='$getTtlPropinsi' and lokasi_kabupatenkota='$getTtlKota' ");
+$getTtlKota3=mysql_fetch_array($getTtlKota2);
+$pattern = '/[^ ]*$/';
+preg_match($pattern, $getTtlKota3[0], $resultsKota);
+$getTtlKota4=ucfirst(strtolower($resultsKota[0]));
+
+//ttl_kecamatan
+$getTtlKecamatan=$query2['kecamatan'];
+$getTtlKecamatan2=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi='$getTtlPropinsi' and lokasi_kabupatenkota = '$getTtlKota' and lokasi_kecamatan = '$getTtlKecamatan' ");
+$getTtlKecamatan3=mysql_fetch_array($getTtlKecamatan2); 
+$getTtlKecamatan4=ucfirst(strtolower($getTtlKecamatan3[0]));
+
+//ttl_kelurahan
+$getTtlKelurahan=explode(".", $query2['kelurahan']);
+$getTtlKelurahan2=$getTtlKelurahan[3];
+$getTtlKelurahan3=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi='$getTtlPropinsi' and lokasi_kabupatenkota = '$getTtlKota' and lokasi_kecamatan = '$getTtlKecamatan' and lokasi_kelurahan='$getTtlKelurahan2' ");
+$getTtlKelurahan4=mysql_fetch_array($getTtlKelurahan3);
+$getTtlKelurahan5=ucfirst(strtolower($getTtlKelurahan4[0]));
+
+
+
+//jenis_kelamin
+$getJkel = $query2['jenis_kelamin'];
+$getJkel2=mysql_query("select jenis_kelamin from jenis_kelamin where id='$getJkel'");
+$getJkel3=mysql_fetch_array($getJkel2);
+
+//agama
+$getAgama=$query2['agama'];
+$getAgama2=mysql_query("select agama from agama where id='$getAgama'");
+$getAgama3=mysql_fetch_array($getAgama2);
+
+//status_pernikahan
+$getStatus = $query2['status_pernikahan'];
+$getStatus2=mysql_query("select status_pernikahan from status_pernikahan where id='$getStatus'");
+$getStatus3=mysql_fetch_array($getStatus2);
+
+
+?>
+	<h2 align="center" class="l1">DAFTAR RIWAYAT HIDUP</h2><br><br><br>
+	<!-- <hr class="l2"> -->
+	<h3>I. DATA DIRI</h3>
+	<?php
+	  //DEFAULT FOTO JIKA KOSONG//
+	    if($query2['foto']=="../assets/images/" || $query2['foto']=="")
+	      $foto = "../assets/images/an.jpg";
+	    else
+	      $foto = $query2['foto'];
+	  ?>
+	<img src="<?php echo $foto ?>" style="max-width: 150px;">
+	<table border="1" style="margin-top: -225px;">
+		<tr>
+			<td width="130">Nama Lengkap</td>
+			<td><?php echo $query2['gelar_depan'];?> <?php echo $query2['nama'];?>, <?php echo $query2['gelar_belakang']; ?></td>
+		</tr>
+		<tr>
+			<td>Tempat / Tanggal Lahir</td>
+			<td><?php echo $getTtlKota4 ?>, <?php echo date("d M Y", strtotime($query2['tanggal_lahir'])) ?></td>
+		</tr>
+		<tr>
+			<td>Jenis Kelamin</td>
+			<td><?php echo $getJkel3[0] ?></td>
+		</tr>
+		<tr>
+			<td>Agama</td>
+			<td><?php echo $getAgama3[0] ?></td>
+		</tr>
+		<tr>
+			<td>Status</td>
+			<td><?php echo $getStatus3[0] ?></td>
+		</tr>
+		<tr>
+			<td>Alamat Rumah</td>
+			<td><?php echo $query2['alamat'] ?> - Rt <?php echo $query2['rt']; ?> Rw <?php echo $query2['rw']; ?> - <?php echo $getTtlKelurahan5 ?> - <?php echo $getTtlKecamatan4 ?> - <?php echo $getTtlKota4 ?> - <?php echo $getTtl_propinsi3[0] ?></td>
+		</tr>
+		<tr>
+			<td>Kode Pos</td>
+			<td><?php echo $query2['kode_pos'] ?></td>
+		</tr>
+		<tr>
+			<td>Telepon</td>
+			<td>- <?php echo $query2['telepon'] ?><br>- <?php echo $query2['hp1'] ?><br>- <?php echo $query2['hp2'] ?></td>
+		</tr>
+		<tr>
+			<td>Tanggal Masuk</td>
+			<td><?php echo date("d M Y",strtotime($query2['tanggal_masuk']))  ?></td>
+		</tr>
+		<tr>
+			<td>Tanggal Pengangkatan</td>
+			<td><?php echo date("d M Y",strtotime($query2['tanggal_pengangkatan'])) ?></td>
+		</tr>
+		<tr>
+			<td>Pengalaman Kerja</td>
+			<td><?php echo $query2['pengalaman_kerja'] ?></td>
+		</tr>
+	</table>	
+	<h3 class="l2">II. RIWAYAT PENDIDIKAN</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center"><strong>Tingkat</strong></th>
+				<th width="50" align="center"><strong>Nama Instansi</strong></th>
+				<th width="50" align="center"><strong>Jurusan</strong></th>
+				<th width="50" align="center"><strong>No. Ijazah</strong></th>
+				<th width="50" align="center"><strong>Alamat</strong></th>
+				<th width="50" align="center"><strong>Nama Kepala</strong></th>
+			</tr>
+		</thead>
+		<?php
+			//RIWAYAT PENDIDIKAN
+			$id=$_GET['id'];
+			$getRwtPdd=mysql_query("select * from rwt_pendidikan where id_peg='$id' order by tingkat desc");
+			while($getRwtPdd2=mysql_fetch_array($getRwtPdd)){
+
+			//jenjang_pendidikan
+			$getJenjang=$getRwtPdd2['tingkat'];
+			
+			$getJenjang2=mysql_query("select pendidikan from jenjang_pendidikan where id='$getJenjang' ");
+			$getJenjang3=mysql_fetch_array($getJenjang2);
+
+
+			//ttl_propinsi
+			$getTtl_propinsi=$getRwtPdd2['provinsi'];
+			$getTtl_propinsi2=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi = '$getTtl_propinsi'");
+			$getTtl_propinsi3=mysql_fetch_array($getTtl_propinsi2);
+
+			//ttl_kota
+			$getTtlPropinsi=$getRwtPdd2['provinsi'];
+			$getTtlKota=$getRwtPdd2['kota'];
+			$getTtlKota2=mysql_query("select lokasi_nama from inf_lokasi where lokasi_propinsi='$getTtlPropinsi' and lokasi_kabupatenkota='$getTtlKota' ");
+			$getTtlKota3=mysql_fetch_array($getTtlKota2);
+			$pattern = '/[^ ]*$/';
+			preg_match($pattern, $getTtlKota3[0], $resultsKota);
+			$getTtlKota4=ucfirst(strtolower($resultsKota[0]));
+		?>
+			<tr>
+				<td align="center"><?php echo $getJenjang3[0] ?></td>
+				<td align="center"><?php echo $getRwtPdd2['nama'] ?></td>
+				<td align="center"><?php echo $getRwtPdd2['jurusan'] ?></td>
+				<td align="center"><?php echo $getRwtPdd2['noijazah'] ?></td>
+				<td align="center"><?php echo $getRwtPdd2['alamat'] ?> - <?php echo $getTtlKota4 ?> - <?php echo $getTtl_propinsi3[0] ?></td>
+				<td align="center"><?php echo $getRwtPdd2['kepala'] ?></td>
+			</tr>
+			<?php } ?>
+	</table>
+	<h3 class="l2">III. RIWAYAT JABATAN</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Jabatan</strong></th>
+				<th width="50" align="center"><strong>Pejabat</strong></th>
+				<th width="50" align="center"><strong>Nomor SK</strong></th>
+				<th width="50" align="center"><strong>Tanggal SK</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtPkj=mysql_query("select * from rwt_jabatan where id_peg = '$id'");
+		while($getRwtPkj2=mysql_fetch_array($getRwtPkj)){
+
+		$getJabatan=$getRwtPkj2['jabatan'];	
+		$getJabatan2=mysql_query("select jenis_jabatan from jenis_jabatan where id='$getJabatan' ")	;
+		$getJabatan3=mysql_fetch_array($getJabatan2);
+		?>
+		<tr>
+			<td align="center"><?php echo $getJabatan3[0]  ?></td>
+			<td align="center"><?php echo $getRwtPkj2['pejabat'] ?></td>
+			<td align="center"><?php echo $getRwtPkj2['nosk'] ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwtPkj2['tglsk'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+	<h3 class="l2">III. RIWAYAT PELATIHAN</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Pelatihan</strong></th>
+				<th width="50" align="center"><strong>Lokasi</strong></th>
+				<th width="50" align="center"><strong>Tanggal Sertifikat</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtpelatihan=mysql_query("select * from rwt_pelatihan where id_peg = '$id'");
+		while($getRwtpelatihan2=mysql_fetch_array($getRwtpelatihan)){
+		?>
+		<tr>
+			<td align="center"><?php echo $getRwtpelatihan2['nama_pelatihan']  ?></td>
+			<td align="center"><?php echo $getRwtpelatihan2['lokasi'] ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwtpelatihan2['tanggal_sertifikat'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">III. RIWAYAT SEMINAR</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Uraian</strong></th>
+				<th width="50" align="center"><strong>Lokasi</strong></th>
+				<th width="50" align="center"><strong>Tanggal</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtseminar=mysql_query("select * from rwt_seminar where id_peg = '$id'");
+		while($getRwtseminar2=mysql_fetch_array($getRwtseminar)){
+		?>
+		<tr>
+			<td align="center"><?php echo $getRwtseminar2['uraian']  ?></td>
+			<td align="center"><?php echo $getRwtseminar2['lokasi'] ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwtseminar2['tanggal'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">III. RIWAYAT ORGANISASI</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Uraian</strong></th>
+				<th width="50" align="center"><strong>Lokasi</strong></th>
+				<th width="50" align="center"><strong>Tanggal</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtorganisasi=mysql_query("select * from rwt_organisasi where id_peg = '$id'");
+		while($getRwtorganisasi2=mysql_fetch_array($getRwtorganisasi)){
+		?>
+		<tr>
+			<td align="center"><?php echo $getRwtorganisasi2['uraian']  ?></td>
+			<td align="center"><?php echo $getRwtorganisasi2['lokasi'] ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwtorganisasi2['tanggal'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">III. RIWAYAT DP 3 / PENILAIAN KERJA</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Tahun</strong></th>
+				<th width="50" align="center"><strong>Rata - Rata</strong></th>
+				<th width="50" align="center"><strong>Atasan</strong></th>
+				<th width="50" align="center"><strong>Penilai</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtdp3=mysql_query("select * from rwt_dp3 where id_peg = '$id'");
+		while($getRwtdp32=mysql_fetch_array($getRwtdp3)){
+		?>
+		<tr>
+			<td align="center"><?php echo $getRwtdp32['tahun']  ?></td>
+			<td align="center"><?php echo $getRwtdp32['rata2'] ?></td>
+			<td align="center"><?php echo $getRwtdp32['atasan'] ?></td>
+			<td align="center"><?php echo $getRwtdp32['penilai'] ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">RIWAYAT GAJI POKOK</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center" ><strong>Golongan</strong></th>
+				<th width="50" align="center"><strong>Gaji Pokok</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtgapok=mysql_query("select * from rwt_gajipokok where id_peg = '$id'");
+		while($getRwtgapok2=mysql_fetch_array($getRwtgapok)){
+		$getGol=$getRwtgapok2['golongan'];
+		$getGol2=mysql_query("select pangkat from gol_ruang where id='$getGol' ");
+		$getGol3=mysql_fetch_array($getGol2);
+		?>
+		<tr>
+			<td align="center"><?php echo $getGol3[0]  ?></td>
+			<td align="center">Rp <?php echo $getRwtgapok2['gaji_pokok'] ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">RIWAYAT PENGHARGAAN</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center"><strong>Nama Penghargaan</strong></th>
+				<th width="50" align="center"><strong>No SK</strong></th>
+				<th width="50" align="center"><strong>Tanggal SK</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwtpenghargaan=mysql_query("select * from rwt_penghargaan where id_peg = '$id'");
+		while($getRwtpenghargaan2=mysql_fetch_array($getRwtpenghargaan)){
+
+		$getpenghargaan=$getRwtpenghargaan2['nama_penghargaan'];
+		$getpenghargaan2=mysql_query("select penghargaan from master_penghargaan where id='$getpenghargaan' ");
+		$getpenghargaan3=mysql_fetch_array($getpenghargaan2);
+		?>
+		<tr>
+			<td align="center"><?php echo $getpenghargaan3[0]  ?></td>
+			<td align="center"><?php echo $getRwtpenghargaan2['nosk'] ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwtpenghargaan2['tanggal_sk'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+
+	<h3 class="l2">RIWAYAT HUKUMAN</h3>
+	<table border="1" align="center">
+		<thead>
+			<tr>
+				<th width="50" align="center"><strong>Nama Hukuman</strong></th>
+				<th width="50" align="center"><strong>Tanggal</strong></th>
+			</tr>
+		</thead>
+		<?php
+		$id=$_GET['id'];
+		$getRwthukuman=mysql_query("select * from rwt_hukuman where id_peg = '$id'");
+		while($getRwthukuman2=mysql_fetch_array($getRwthukuman)){
+
+		$gethukuman=$getRwthukuman2['nama_hukuman'];
+		$gethukuman2=mysql_query("select hukuman from master_hukuman where id='$gethukuman' ");
+		$gethukuman3=mysql_fetch_array($gethukuman2);
+		?>
+		<tr>
+			<td align="center"><?php echo $gethukuman3[0]  ?></td>
+			<td align="center"><?php echo date("d M Y", strtotime($getRwthukuman2['tanggal'])) ?></td>
+		</tr>
+		<?php } ?>
+	</table>
+		
+<!-- 	<div id="comment"><p>Printed on <?php date_default_timezone_set('Asia/Jakarta'); echo date("d M Y : h i s") ?> | Generated by SIMPEG @RodjoLand.com at <?php ?></p>
+	<div id="footer">
+    	<p class="page"></p>
+  	</div> -->
+
+</body>
+
+</html>

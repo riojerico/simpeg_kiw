@@ -1,0 +1,5 @@
+Data table dan modal crash
+data table dibawah jquery -> data table bisa(tanpa modal dilooping), modal nggak bisa.
+data table diatas jquery  -> data table nggak bisa, modal bisa.
+
+bootstrap.js diatas jquery -> data table dan modal bisa, tapi modal looping nggak bisa.
